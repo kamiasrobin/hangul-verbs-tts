@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hangul Verbs TTS by robin zantua</title>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Hangul Verbs</h1>
+  <table id="verbTable">
+    <thead>
+      <tr>
+        <th>Row</th>
+        <th>Hangul</th>
+        <th>English Translation</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="verbList"></tbody>
+  </table>
+
+  <script>
+    function readExcelFile(evt) {
+      var file = evt.target.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, { type: 'array' });
+        var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        var verbs = XLSX.utils.sheet_to_json(worksheet, { header: ['A', 'B'] });
+
+        populateVerbList(verbs);
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function populateVerbList(verbs) {
+      var tbody = document.getElementById('verbList');
+
+      verbs.forEach(function(verb, index) {
+        var row = document.createElement('tr');
+
+        var rowNumberCell = document.createElement('td');
+        rowNumberCell.textContent = index + 1;
+        row.appendChild(rowNumberCell);
+
+        var hangulCell = document.createElement('td');
+        hangulCell.textContent = verb.A;
+        row.appendChild(hangulCell);
+
+        var translationCell = document.createElement('td');
+        translationCell.textContent = verb.B;
+        row.appendChild(translationCell);
+
+        var ttsButtonCell = document.createElement('td');
+        var ttsButton = document.createElement('button');
+        ttsButton.textContent = 'TTS';
+        ttsButton.onclick = function() {
+          speakVerb(verb.A);
+        };
+        ttsButtonCell.appendChild(ttsButton);
+        row.appendChild(ttsButtonCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function speakVerb(verb) {
+      var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=ko&client=tw-ob&q=' + encodeURIComponent(verb);
+      var audio = new Audio(url);
+      audio.play();
+    }
+  </script>
+
+  <input type="file" id="fileInput" accept=".xlsx" onchange="readExcelFile(event)">
+</body>
+</html>
