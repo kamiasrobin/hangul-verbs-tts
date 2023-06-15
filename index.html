@@ -69,7 +69,8 @@
 
     function speakVerb(verb) {
       var lang = 'ko'; // Language code for Korean
-      var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=' + lang + '&client=tw-ob&q=' + encodeURIComponent(verb);
+      var proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Proxy URL to bypass CORS
+      var url = proxyUrl + 'https://translate.google.com/translate_tts?ie=UTF-8&tl=' + lang + '&client=tw-ob&q=' + encodeURIComponent(verb);
       var audio = new Audio(url);
       audio.play();
     }
